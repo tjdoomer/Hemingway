@@ -23,12 +23,29 @@ export function shortId(): string {
 
 /**
  * Expand home directory in paths
+ * Validates input to prevent path traversal attacks
  */
 export function expandPath(filePath: string): string {
   if (filePath.startsWith('~')) {
-    return path.join(os.homedir(), filePath.slice(1));
+    // Remove the ~ and leading separator (~/foo -> foo, ~foo -> foo)
+    const userPath = filePath.slice(1).replace(/^[/\\]/, '');
+
+    // Check for path traversal sequences BEFORE normalization
+    if (userPath.includes('../') || userPath.includes('..\\')) {
+      throw new Error('Path traversal detected: paths cannot contain "../" sequences');
+    }
+
+    // Normalize the path after validation
+    const normalizedPath = path.normalize(userPath);
+
+    // Additional check: ensure normalized path doesn't escape via ..
+    if (normalizedPath.startsWith('..')) {
+      throw new Error('Path traversal detected: paths cannot contain "../" sequences');
+    }
+
+    return path.join(os.homedir(), normalizedPath);
   }
-  return filePath;
+  return path.normalize(filePath);
 }
 
 /**
@@ -174,7 +191,8 @@ export function log(level: LogLevel, message: string, ...args: unknown[]): void 
   if (LOG_LEVELS[level] >= LOG_LEVELS[currentLogLevel]) {
     const timestamp = new Date().toISOString();
     const prefix = `[${timestamp}] [${level.toUpperCase()}]`;
-    console.log(prefix, message, ...args);
+    // Use a safe format to prevent format string injection
+    console.log('%s %s', prefix, message, ...args);
   }
 }
 
