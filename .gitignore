@@ -33,8 +33,13 @@ coverage/
 tmp/
 .tmp/
 
-# Security scan reports (contain sensitive findings)
+# Hemingway local-only files (NEVER commit to public repo)
+# Agent prompts contain implementation details and security-sensitive guidance
+.hemingway/prompts/
+# Security scan reports contain vulnerability details
 .hemingway/security-reports/
+# Security fix documentation describes specific attack vectors
+SECURITY_FIXES.md
 
 # Security agent config (generated per-repo)
 .security-agent.yml
