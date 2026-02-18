@@ -23,7 +23,7 @@ import { modelClient, type CompletionResponse } from '../models/index.js';
 import { modelDetector } from '../models/detector.js';
 import { getMemoryStore } from '../memory/index.js';
 import { generateId, logger } from '../utils/index.js';
-import EventEmitter from 'eventemitter3';
+import { EventEmitter } from 'eventemitter3';
 
 interface AgentEvents {
   'started': (task: Task) => void;

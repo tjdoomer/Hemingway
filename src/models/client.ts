@@ -195,7 +195,10 @@ export class ModelClient {
     const tools = options.tools?.map(tool => ({
       name: tool.name,
       description: tool.description,
-      input_schema: this.zodToJsonSchema(tool.parameters),
+      input_schema: {
+        type: 'object' as const,
+        ...this.zodToJsonSchema(tool.parameters),
+      },
     }));
 
     try {
